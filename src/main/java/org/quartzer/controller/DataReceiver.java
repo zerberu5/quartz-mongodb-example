@@ -9,9 +9,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.quartzer.dto.MyData;
 import org.quartzer.job.RandomNumJob;
-import org.quartzer.persistence.MyDataRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +24,8 @@ import java.util.UUID;
 public class DataReceiver {
 
     private final Scheduler scheduler;
-    private final MyDataRepository myDataRepository;
-    private int counter;
 
-    public DataReceiver(Scheduler scheduler, MyDataRepository myDataRepository) {
-        this.myDataRepository = myDataRepository;
+    public DataReceiver(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
@@ -43,14 +38,11 @@ public class DataReceiver {
         String keyName = String.valueOf(UUID.randomUUID());
         JobDetail randomNumJob = JobBuilder.newJob(RandomNumJob.class)
                 .withIdentity(keyName)
-                .storeDurably()
+                .storeDurably() // notwendig, wenn Persistenz erfordert ist
                 .build();
 
-        log.info("Identity/KeyName: " + keyName);
+        log.info("Identity/KeyName: {}", keyName);
 
-//        MyData myData = new MyData();
-//        myData.setValue(5);
-//        myDataRepository.save(myData);
         scheduler.addJob(randomNumJob, true, true);
         scheduler.scheduleJob(randomNumJob, trigger);
         return ResponseEntity.ok("Passt");
