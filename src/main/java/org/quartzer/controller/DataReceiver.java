@@ -27,6 +27,7 @@ public class DataReceiver {
 
     private final Scheduler scheduler;
     private final MyDataRepository myDataRepository;
+    private int counter;
 
     public DataReceiver(Scheduler scheduler, MyDataRepository myDataRepository) {
         this.myDataRepository = myDataRepository;
@@ -39,11 +40,13 @@ public class DataReceiver {
 
         Trigger trigger = TriggerBuilder.newTrigger().startNow().build();
 
+        String keyName = String.valueOf(UUID.randomUUID());
         JobDetail randomNumJob = JobBuilder.newJob(RandomNumJob.class)
-                .withIdentity(String.valueOf(UUID.randomUUID()))
+                .withIdentity(keyName)
                 .storeDurably()
                 .build();
 
+        log.info("Identity/KeyName: " + keyName);
 
 //        MyData myData = new MyData();
 //        myData.setValue(5);
